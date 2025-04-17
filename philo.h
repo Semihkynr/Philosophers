@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 23:56:08 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/14 00:41:49 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/16 12:56:38 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct s_philo
 //code 
 
 // utils
-int	ft_atoi(const char *str);
+size_t	ft_atoi(const char *str);
+int	numctl(char *str);
 
 #endif
