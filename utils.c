@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 23:55:55 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/16 12:56:19 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/17 13:06:28 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	numctl(char *str)
 	while (str[j])
 	{
 		if (str[j] == '-' || str[j] == '+')
-			return(0);
+			return (0);
 		if (!ft_isdigit(str[j]))
 			return (0);
 		j++;
@@ -35,9 +35,9 @@ int	numctl(char *str)
 
 size_t	ft_atoi(const char *str)
 {
-	int	isaret;
+	int		isaret;
 	size_t	basamak;
-	int	i;
+	int		i;
 
 	isaret = 1;
 	basamak = 0;
