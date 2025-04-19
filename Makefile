@@ -1,6 +1,6 @@
 NAME=philo
 
-SRCS= philo.c utils.c
+SRCS= philo.c utils.c forlife.c
 CFLAGS=-Wall -Wextra -Werror -pthread
 
 

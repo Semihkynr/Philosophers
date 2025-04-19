@@ -1,0 +1,11 @@
+0 1 has taken a fork
+1 1 has taken a fork
+1 3 has taken a fork
+1 3 has taken a fork
+3 5 has taken a fork
+3 5 has taken a fork
+4 7 has taken a fork
+4 7 has taken a fork
+4 9 has taken a fork
+4 9 has taken a fork
+5 10 has taken a fork

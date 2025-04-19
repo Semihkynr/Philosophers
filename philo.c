@@ -6,50 +6,36 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 23:56:03 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/18 18:09:54 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/19 15:29:40 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*routine()
+void	*routine(void *arg)
 {
-	// t_philo *philo = (t_philo *)arg;
-	// while (1)
-	// {
-	// 	// take_forks(philo);
-	// 	// eat(philo);
-	// 	// drop_forks(philo);
-	// 	// sleep_and_think(philo);
-	// }
+	t_philo *philo = (t_philo *)arg;
+	while (1)
+	{
+		take_forks(philo);
+		eat(philo);
+		drop_forks(philo);
+		sleep_and_think(philo);
+	}
 	return(NULL);
 }
-
-long	get_time(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-}
-
 
 void	create_threads(t_philo *philo)
 {
 	int	i;
 
 	i = 0;
-	philo->rules->start_time = get_time();
+	philo->rules->start_time = 0;
+	philo->rules->start_time = get_time(philo);
 	while (i < philo->rules->philo_count)
 	{
-		pthread_create(&philo[i].thread, NULL, &routine, &philo[i]);
+		pthread_create(&philo[i].thread, NULL, routine, &philo[i]);
 		usleep(100);
-		i++;
-	}
-	i = 0;
-	while(i < philo->rules->philo_count)
-	{
-		printf("PHİLO %d oluştu\n" , philo[i].id);
 		i++;
 	}
 }
@@ -61,12 +47,11 @@ void	init_mutex(t_philo *philo)
 	i = 0;
 	while (i < philo->rules->philo_count)
 	{
-		pthread_mutex_init(&philo->rules->forks[i], NULL);
+		pthread_mutex_init(&philo->forks[i], NULL);
 		philo[i].id = i + 1;
 		philo[i].eaten = 0;
-		philo[i].left_fork = &philo->rules->forks[i];
-		philo[i].right_fork = &philo->rules->forks[(i + 1)
-			% philo->rules->philo_count];
+		philo[i].rules = philo[0].rules;
+		philo[i].forks = philo[0].forks;
 		i++;
 	}
 }
@@ -82,7 +67,7 @@ void	start_philo(t_philo *philo, char **av, int ac)
 		philo->rules->must_eat = ft_atoi(av[5]);
 	else
 		philo->rules->must_eat = -1;
-	philo->rules->forks = malloc(sizeof(pthread_mutex_t)
+	philo->forks = malloc(sizeof(pthread_mutex_t)
 			* philo->rules->philo_count);
 }
 
@@ -118,10 +103,11 @@ int	main(int ac, char **av)
 	if (!avctl(ac, av))
 		return (0);
 	philo = malloc(sizeof(t_philo) * ft_atoi(av[1]));
+
 	start_philo(philo, av, ac);
 	init_mutex(philo);
 	create_threads(philo);
-	free(philo->rules->forks);
+	free(philo->forks);
 	free(philo->rules);
 	free(philo);
 	return (0);

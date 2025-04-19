@@ -6,11 +6,19 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 23:55:55 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/17 13:06:28 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/19 13:29:08 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+long	get_time(t_philo *philo)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000) - philo->rules->start_time);
+}
 
 int	ft_isdigit(int a)
 {
