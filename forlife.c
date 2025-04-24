@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 18:01:46 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/19 15:12:23 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/23 12:39:55 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,30 @@ void printer(t_philo *philo ,int msg)
 
 void	take_forks(t_philo *philo)
 {
-    pthread_mutex_lock(&philo->forks[philo->id]);
-    printer(philo , 1);
-    pthread_mutex_lock(&philo->forks[(philo->id + 1) % philo->rules->philo_count]);
-    printer(philo , 1);
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(&philo->forks[(philo->id + 1) % philo->rules->philo_count]);
+		printer(philo, 1);
+		pthread_mutex_lock(&philo->forks[philo->id]);
+		printer(philo, 1);
+	}
+	else
+	{
+		pthread_mutex_lock(&philo->forks[philo->id]);
+		printer(philo, 1);
+		pthread_mutex_lock(&philo->forks[(philo->id + 1) % philo->rules->philo_count]);
+		printer(philo, 1);
+	}
 }
 
  void	eat(t_philo *philo)
  {
+    unsigned long now;
+    now = get_time(philo);
     philo->eaten++;
-    printf("%lu %d is eating\n", get_time(philo), philo->id);
-    usleep(philo->rules->time_to_eat * 1000);
-    
+    printf("%lu %d is eating\n", now, philo->id);
+    philo->last_meal = now;
+    usleep(philo->rules->time_to_eat);
 }
 
 void	drop_forks(t_philo *philo)
@@ -44,8 +56,7 @@ void	drop_forks(t_philo *philo)
 }
 void sleep_and_think(t_philo *philo)
 {
-    printf("%lu %d is sleeping\n", get_time(philo), philo->id + 1);
-    usleep(philo->rules->time_to_sleep * 1000);
-    printf("%lu %d is thinking\n", get_time(philo), philo->id + 1);
-	//yiyenler uyicak yemeyenler uyumicak bunun için kaç defa yediğini struckt a işledim
+    printf("%lu %d is sleeping\n", get_time(philo), philo->id);
+    usleep(philo->rules->time_to_sleep);
+    printf("%lu %d is thinking\n", get_time(philo), philo->id);
 }

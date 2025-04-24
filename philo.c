@@ -6,15 +6,37 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 23:56:03 by skaynar           #+#    #+#             */
-/*   Updated: 2025/04/19 15:29:40 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/04/23 12:40:49 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+void	*monitor(void *arg)
+{
+	t_philo *philo = (t_philo *)arg;
+	int i;
+
+	while (1)
+	{
+		i = 0;
+		while (i < philo->rules->philo_count)
+		{
+			if (get_time(&philo[i]) - philo[i].last_meal >= philo->rules->time_to_die)
+			{
+				printf("%lu %d died\n", get_time(&philo[i]), philo[i].id);
+				exit(0);
+			}
+			i++;
+		}
+	}
+	return (NULL);
+}
+
 void	*routine(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
+	
 	while (1)
 	{
 		take_forks(philo);
@@ -22,15 +44,15 @@ void	*routine(void *arg)
 		drop_forks(philo);
 		sleep_and_think(philo);
 	}
-	return(NULL);
+	return (NULL);
 }
+
 
 void	create_threads(t_philo *philo)
 {
 	int	i;
 
 	i = 0;
-	philo->rules->start_time = 0;
 	philo->rules->start_time = get_time(philo);
 	while (i < philo->rules->philo_count)
 	{
@@ -38,6 +60,17 @@ void	create_threads(t_philo *philo)
 		usleep(100);
 		i++;
 	}
+	pthread_t	monitor_thread;
+	pthread_create(&monitor_thread, NULL, monitor, philo);
+	
+	int j = 0;
+	while (j < philo->rules->philo_count)
+	{
+		pthread_join(philo[j].thread, NULL);
+		j++;
+	}
+	pthread_join(monitor_thread, NULL);
+
 }
 
 void	init_mutex(t_philo *philo)
@@ -52,6 +85,7 @@ void	init_mutex(t_philo *philo)
 		philo[i].eaten = 0;
 		philo[i].rules = philo[0].rules;
 		philo[i].forks = philo[0].forks;
+		philo[i].last_meal = get_time(&philo[i]);
 		i++;
 	}
 }
@@ -69,6 +103,8 @@ void	start_philo(t_philo *philo, char **av, int ac)
 		philo->rules->must_eat = -1;
 	philo->forks = malloc(sizeof(pthread_mutex_t)
 			* philo->rules->philo_count);
+	philo->rules->start_time = 0;
+	philo->rules->start_time = get_time(philo);
 }
 
 int	avctl(int ac, char **av)
