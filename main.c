@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:17 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/12 15:44:39 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/12 18:04:26 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_usleep(size_t mls)
 
 	start = get_time_ms();
 	while (get_time_ms() - start < mls)
-		usleep(100);
+		usleep(10);
 }
 
 void	writes(t_philo *p, int num)
@@ -84,7 +84,7 @@ void	main_thread(t_rules *rules)
 		}
 		pthread_mutex_unlock(&rules->is_eat);
 		i++;
-		ft_usleep(100);
+		ft_usleep(10);
 	}
 }
 
@@ -128,7 +128,7 @@ int	thread_create(t_rules *rules)
 		rules->philos[i].data = rules;
 		pthread_create(&rules->philos[i].thread, NULL, life,
 			&rules->philos[i]);
-		ft_usleep(100);
+		ft_usleep(1);
 	}
 	return (0);
 }
