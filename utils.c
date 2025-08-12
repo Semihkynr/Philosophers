@@ -6,21 +6,30 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:19 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/07 10:38:22 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/10 10:47:56 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	get_mss(t_philo *philo)
+long get_time_ms(void)
 {
-	long	t;
-	struct timeval	tv;
-
-	t = philo->rules->start_time;
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_usec / 1000 + tv.tv_sec * 1000) - t);
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
+
+long set_time(t_rules *rules)
+{
+    return (get_time_ms() - rules->start_time);
+}
+// long	set_time(t_rules *rules)
+// {
+// 	struct timeval	tv;
+
+// 	gettimeofday(&tv, NULL);
+// 	return ((tv.tv_usec / 1000 + tv.tv_sec * 1000) - rules->start_time);
+// }
 
 int	avctl(int ac, char **av)
 {
@@ -29,7 +38,7 @@ int	avctl(int ac, char **av)
 	i = 1;
 	while (av[i])
 	{
-		if (!(numctl(av[i])))
+		if (!(numctl(av[i])) || av[1][0] == '0')
 			return (printf("ERROR\n"), 0);
 		i++;
 	}
@@ -41,10 +50,12 @@ be greater than 200 and less than 1.\n"), 0);
 		if (ft_atoi(av[2]) < 60 || ft_atoi(av[3]) < 60 || ft_atoi(av[4]) < 60)
 			return (printf("ERROR!!! -> Eating time, dying time or \
 sleeping time should not be below 60.\n"), 0);
-		return (1);
+		if(ac == 6 && ft_atoi(av[5]) < 1 )
+			return (printf("The amount to eat cannot be less than 1\n"), 0);
 	}
 	else
 		return (printf("Wrong Argument İnput !\n"), 0);
+	return(1);
 }
 
 int	ft_isdigit(int a)

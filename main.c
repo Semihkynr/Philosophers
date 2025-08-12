@@ -6,75 +6,155 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:17 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/07 16:23:39 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/12 15:44:39 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*routine(void *arg)
+
+void	ft_usleep(size_t mls)
 {
-	t_philo *philo = (t_philo *)arg;
-	
+	size_t	start;
+
+	start = get_time_ms();
+	while (get_time_ms() - start < mls)
+		usleep(100);
+}
+
+void	writes(t_philo *p, int num)
+{
+	if (num == 0)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d has taken a fork\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 1)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is sleeping\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 2)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is thinking\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 3)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is eating\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+}
+
+void	go_sleep(t_philo *p, long time)
+{
+	long	dest_time;
+
+	dest_time = set_time(p->data) + time;
+	while (set_time(p->data) < dest_time)
+		ft_usleep(100);
+}
+
+
+void	main_thread(t_rules *rules)
+{
+	int	i;
+
+	i = 1;
 	while (1)
 	{
-		pthread_mutex_lock(&philo->eaten);
-		if (philo->rules->must_eat != -1
-			&& philo->eat_count >= data->must_eat * data->number_philo)
+		pthread_mutex_lock(&rules->is_eat);
+		if (rules->must_eat != -1
+			&& rules->eat_count >= rules->must_eat * rules->num)
 		{
-			pthread_mutex_lock(&data->write_mutex);
+			pthread_mutex_lock(&rules->mutex);
 			return ;
 		}
-		data->cont = (i % data->number_philo);
-		if (get_mss(data) - data->philos[data->cont].last_eat
-			>= data->time_to_die)
+		rules->cont = (i % rules->num);
+		if (set_time(rules) - rules->philos[rules->cont].last_eat
+			>= rules->time_to_die)
 		{
-			pthread_mutex_lock(&data->write_mutex);
-			printf("%lu %d died\n", get_mss(data), data->cont + 1);
+			pthread_mutex_lock(&rules->mutex);
+			printf("%lu %d died\n", set_time(rules), rules->cont + 1);
 			return ;
 		}
-		pthread_mutex_unlock(&data->is_eat);
+		pthread_mutex_unlock(&rules->is_eat);
 		i++;
-		usleep(100);
+		ft_usleep(100);
+	}
+}
+
+void	*life(void *philo)
+{
+	t_philo	*p;
+
+	p = (t_philo*)philo;
+	while (1)
+	{
+		pthread_mutex_lock(&p->data->forks[p->id]);
+		writes(p, 0);
+		pthread_mutex_lock(&p->data->forks[(p->id + 1)
+			% p->data->num]);
+		writes(p, 0);
+		writes(p, 3);
+		pthread_mutex_lock(&p->data->is_eat);
+		p->data->eat_count++;
+		p->last_eat = set_time(p->data);
+		pthread_mutex_unlock(&p->data->is_eat);
+		go_sleep(p, p->data->time_to_eat);
+		writes(p, 1);
+		pthread_mutex_unlock(&p->data->forks[p->id]);
+		pthread_mutex_unlock(&p->data->forks[(p->id + 1)
+			% p->data->num]);
+		go_sleep(p, p->data->time_to_sleep);
+		writes(p, 2);
 	}
 	return (NULL);
 }
 
-void	create_threads(t_philo *philo)
+int	thread_create(t_rules *rules)
 {
 	int	i;
-
-	i = 0;
-	philo->rules->start_time = get_time(philo);
-	while (i < philo->rules->philo_count)
+	i = -1;
+	while (++i < rules->num)
 	{
-		pthread_create(&philo[i].thread, NULL, &routine, &philo[i]);
-		usleep(100);
-		i++;
+		rules->philos[i].last_eat = set_time(rules);
+		rules->philos[i].dead = false;
+		rules->philos[i].id = i;
+		rules->philos[i].data = rules;
+		pthread_create(&rules->philos[i].thread, NULL, life,
+			&rules->philos[i]);
+		ft_usleep(100);
 	}
+	return (0);
 }
 
-void	init_mutex(t_philo *philo)
+void	start_philo(t_rules *rules, char **av)
 {
-	int	i;
-
-	i = 0;
-	while (i < philo->rules->philo_count)
-	{
-		pthread_mutex_init(&philo->forks[i], NULL);
-		philo[i].id = i + 1;
-		philo[i].eaten = 0;
-		philo[i].rules = philo[0].rules;
-		philo[i].forks = philo[0].forks;
-		philo[i].last_meal = get_time(&philo[i]);
-		i++;
-	}
-	create_threads(philo);
-}
-
-void	start_philo(t_rules *rules, char **av, int ac)
-{
+	int i;
 	
+	i = -1;
+	rules->eat_count = 0;
+	rules->must_eat = -1;
+	rules->start_time = 0;
+	rules->num = ft_atoi(av[1]);
+	rules->time_to_die = ft_atoi(av[2]);
+	rules->time_to_eat = ft_atoi(av[3]);
+	rules->time_to_sleep = ft_atoi(av[4]);
+	rules->start_time = set_time(rules);
+	if(av[5])
+		rules->must_eat = ft_atoi(av[5]);
+	pthread_mutex_init(&rules->is_eat, NULL);
+	pthread_mutex_init(&rules->mutex, NULL);
+	rules->philos = malloc(sizeof(t_philo) * rules->num);
+	rules->forks = malloc(sizeof(pthread_mutex_t) * rules->num);
+	while (++i < rules->num)
+		pthread_mutex_init(&rules->forks[i], NULL);
+	thread_create(rules);
 }
 
 int main(int ac, char **av)
@@ -84,6 +164,7 @@ int main(int ac, char **av)
 	
     t_rules *rules;
 	rules = (t_rules *)malloc(sizeof(t_rules));
-    start_philo(rules);
+    start_philo(rules, av);
+	main_thread(rules);
     return(0);
 }
