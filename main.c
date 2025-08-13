@@ -6,59 +6,11 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:17 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/12 18:04:26 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/13 17:18:46 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-
-void	ft_usleep(size_t mls)
-{
-	size_t	start;
-
-	start = get_time_ms();
-	while (get_time_ms() - start < mls)
-		usleep(10);
-}
-
-void	writes(t_philo *p, int num)
-{
-	if (num == 0)
-	{
-		pthread_mutex_lock(&p->data->mutex);
-		printf("%lu %d has taken a fork\n", set_time(p->data), p->id + 1);
-		pthread_mutex_unlock(&p->data->mutex);
-	}
-	else if (num == 1)
-	{
-		pthread_mutex_lock(&p->data->mutex);
-		printf("%lu %d is sleeping\n", set_time(p->data), p->id + 1);
-		pthread_mutex_unlock(&p->data->mutex);
-	}
-	else if (num == 2)
-	{
-		pthread_mutex_lock(&p->data->mutex);
-		printf("%lu %d is thinking\n", set_time(p->data), p->id + 1);
-		pthread_mutex_unlock(&p->data->mutex);
-	}
-	else if (num == 3)
-	{
-		pthread_mutex_lock(&p->data->mutex);
-		printf("%lu %d is eating\n", set_time(p->data), p->id + 1);
-		pthread_mutex_unlock(&p->data->mutex);
-	}
-}
-
-void	go_sleep(t_philo *p, long time)
-{
-	long	dest_time;
-
-	dest_time = set_time(p->data) + time;
-	while (set_time(p->data) < dest_time)
-		ft_usleep(100);
-}
-
 
 void	main_thread(t_rules *rules)
 {
@@ -96,22 +48,22 @@ void	*life(void *philo)
 	while (1)
 	{
 		pthread_mutex_lock(&p->data->forks[p->id]);
-		writes(p, 0);
+		for_out(p, 0);
 		pthread_mutex_lock(&p->data->forks[(p->id + 1)
 			% p->data->num]);
-		writes(p, 0);
-		writes(p, 3);
+		for_out(p, 0);
+		for_out(p, 3);
 		pthread_mutex_lock(&p->data->is_eat);
 		p->data->eat_count++;
 		p->last_eat = set_time(p->data);
 		pthread_mutex_unlock(&p->data->is_eat);
 		go_sleep(p, p->data->time_to_eat);
-		writes(p, 1);
+		for_out(p, 1);
 		pthread_mutex_unlock(&p->data->forks[p->id]);
 		pthread_mutex_unlock(&p->data->forks[(p->id + 1)
 			% p->data->num]);
 		go_sleep(p, p->data->time_to_sleep);
-		writes(p, 2);
+		for_out(p, 2);
 	}
 	return (NULL);
 }
@@ -145,7 +97,7 @@ void	start_philo(t_rules *rules, char **av)
 	rules->time_to_die = ft_atoi(av[2]);
 	rules->time_to_eat = ft_atoi(av[3]);
 	rules->time_to_sleep = ft_atoi(av[4]);
-	rules->start_time = set_time(rules);
+	rules->start_time = get_time_ms();
 	if(av[5])
 		rules->must_eat = ft_atoi(av[5]);
 	pthread_mutex_init(&rules->is_eat, NULL);

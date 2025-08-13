@@ -6,30 +6,39 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:19 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/10 10:47:56 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/13 17:01:02 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long get_time_ms(void)
+void	for_out(t_philo *p, int num)
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+	if (num == 0)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d has taken a fork\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 1)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is sleeping\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 2)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is thinking\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
+	else if (num == 3)
+	{
+		pthread_mutex_lock(&p->data->mutex);
+		printf("%lu %d is eating\n", set_time(p->data), p->id + 1);
+		pthread_mutex_unlock(&p->data->mutex);
+	}
 }
-
-long set_time(t_rules *rules)
-{
-    return (get_time_ms() - rules->start_time);
-}
-// long	set_time(t_rules *rules)
-// {
-// 	struct timeval	tv;
-
-// 	gettimeofday(&tv, NULL);
-// 	return ((tv.tv_usec / 1000 + tv.tv_sec * 1000) - rules->start_time);
-// }
 
 int	avctl(int ac, char **av)
 {

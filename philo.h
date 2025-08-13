@@ -33,11 +33,13 @@ typedef struct s_rules
 	t_philo			*philos;
 }					t_rules;
 
-long	set_time(t_rules *rules);
+void	go_sleep(t_philo *p, long time);
+void	ft_usleep(size_t mls);
 long get_time_ms(void);
-int	avctl(int ac, char **av);
-int	ft_isdigit(int a);
-int	numctl(char *str);
+long	set_time(t_rules *rules);
+void	for_out(t_philo *p, int num);
 size_t	ft_atoi(const char *str);
+int	numctl(char *str);
+int	avctl(int ac, char **av);
 
 #endif

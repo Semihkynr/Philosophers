@@ -1,6 +1,6 @@
 NAME=philo
 
-SRCS= main.c utils.c
+SRCS= main.c utils.c utils2.c
 CFLAGS=-Wall -Wextra -Werror -pthread
 
 
