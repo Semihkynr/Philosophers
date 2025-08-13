@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:07:19 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/13 17:01:02 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/13 17:24:31 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,16 +55,18 @@ int	avctl(int ac, char **av)
 	{
 		if (ft_atoi(av[1]) > 200 || ft_atoi(av[1]) < 1)
 			return (printf("ERROR!!! -> The number of philosophers cannot \
-be greater than 200 and less than 1.\n"), 0);
+be greater than 200 and less than 1.\n"),
+				0);
 		if (ft_atoi(av[2]) < 60 || ft_atoi(av[3]) < 60 || ft_atoi(av[4]) < 60)
 			return (printf("ERROR!!! -> Eating time, dying time or \
-sleeping time should not be below 60.\n"), 0);
-		if(ac == 6 && ft_atoi(av[5]) < 1 )
+sleeping time should not be below 60.\n"),
+				0);
+		if (ac == 6 && ft_atoi(av[5]) < 1)
 			return (printf("The amount to eat cannot be less than 1\n"), 0);
 	}
 	else
 		return (printf("Wrong Argument İnput !\n"), 0);
-	return(1);
+	return (1);
 }
 
 int	ft_isdigit(int a)
