@@ -5,117 +5,96 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/07 10:07:17 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/13 17:47:20 by skaynar          ###   ########.fr       */
+/*   Created: 2025/08/16 00:30:23 by skaynar           #+#    #+#             */
+/*   Updated: 2025/08/16 00:30:25 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	main_thread(t_rules *rules)
+int	ft_isdigit(int a)
+{
+	return ((a >= '0' && a <= '9'));
+}
+
+int	numctl(char *str)
+{
+	int	j;
+
+	j = 0;
+	while (str[j])
+	{
+		if (str[j] == '-' || str[j] == '+')
+			return (0);
+		if (!ft_isdigit(str[j]))
+			return (0);
+		j++;
+	}
+	return (1);
+}
+
+size_t	ft_atoi(const char *str)
+{
+	int		isaret;
+	size_t	basamak;
+	int		i;
+
+	isaret = 1;
+	basamak = 0;
+	i = 0;
+	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			isaret *= -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		basamak = basamak * 10 + (str[i] - '0');
+		i++;
+	}
+	return (isaret * basamak);
+}
+int	avctl(int ac, char **av)
 {
 	int	i;
 
 	i = 1;
-	while (1)
+	while (av[i])
 	{
-		pthread_mutex_lock(&rules->is_eat);
-		if (rules->must_eat != -1 && rules->eat_count >= rules->must_eat
-			* rules->num)
-		{
-			pthread_mutex_lock(&rules->mutex);
-			return ;
-		}
-		rules->cont = (i % rules->num);
-		if (set_time(rules)
-			- rules->philos[rules->cont].last_eat >= rules->time_to_die)
-		{
-			pthread_mutex_lock(&rules->mutex);
-			printf("%lu %d died\n", set_time(rules), rules->cont + 1);
-			return ;
-		}
-		pthread_mutex_unlock(&rules->is_eat);
+		if (!(numctl(av[i])) || av[1][0] == '0')
+			return (printf("ERROR\n"), 0);
 		i++;
-		usleep(100);
 	}
-}
-
-void	*life(void *philo)
-{
-	t_philo	*p;
-
-	p = (t_philo *)philo;
-	while (1)
+	if (ac == 6 || ac == 5)
 	{
-		pthread_mutex_lock(&p->data->forks[p->id]);
-		for_out(p, 0);
-		pthread_mutex_lock(&p->data->forks[(p->id + 1) % p->data->num]);
-		for_out(p, 0);
-		for_out(p, 3);
-		pthread_mutex_lock(&p->data->is_eat);
-		p->data->eat_count++;
-		p->last_eat = set_time(p->data);
-		pthread_mutex_unlock(&p->data->is_eat);
-		go_sleep(p, p->data->time_to_eat);
-		for_out(p, 1);
-		pthread_mutex_unlock(&p->data->forks[p->id]);
-		pthread_mutex_unlock(&p->data->forks[(p->id + 1) % p->data->num]);
-		go_sleep(p, p->data->time_to_sleep);
-		for_out(p, 2);
+		if (ft_atoi(av[1]) > 200 || ft_atoi(av[1]) < 1)
+			return (printf("ERROR!!! -> The number of philosophers cannot \
+be greater than 200 and less than 1.\n"),
+				0);
+		if (ft_atoi(av[2]) < 60 || ft_atoi(av[3]) < 60 || ft_atoi(av[4]) < 60)
+			return (printf("ERROR!!! -> Eating time, dying time or \
+sleeping time should not be below 60.\n"),
+				0);
+		if (ac == 6 && ft_atoi(av[5]) < 1)
+			return (printf("The amount to eat cannot be less than 1\n"), 0);
 	}
-	return (NULL);
-}
-
-int	thread_create(t_rules *rules)
-{
-	int	i;
-
-	i = -1;
-	while (++i < rules->num)
-	{
-		rules->philos[i].last_eat = set_time(rules);
-		rules->philos[i].dead = false;
-		rules->philos[i].id = i;
-		rules->philos[i].data = rules;
-		pthread_create(&rules->philos[i].thread, NULL, life, &rules->philos[i]);
-		usleep(100);
-	}
-	return (0);
-}
-
-void	start_philo(t_rules *rules, char **av)
-{
-	int	i;
-
-	i = -1;
-	rules->eat_count = 0;
-	rules->must_eat = -1;
-	rules->start_time = 0;
-	rules->num = ft_atoi(av[1]);
-	rules->time_to_die = ft_atoi(av[2]);
-	rules->time_to_eat = ft_atoi(av[3]);
-	rules->time_to_sleep = ft_atoi(av[4]);
-	rules->start_time = set_time(rules);
-	if (av[5])
-		rules->must_eat = ft_atoi(av[5]);
-	pthread_mutex_init(&rules->is_eat, NULL);
-	pthread_mutex_init(&rules->mutex, NULL);
-	rules->philos = malloc(sizeof(t_philo) * rules->num);
-	rules->forks = malloc(sizeof(pthread_mutex_t) * rules->num);
-	while (++i < rules->num)
-		pthread_mutex_init(&rules->forks[i], NULL);
-	thread_create(rules);
+	else
+		return (printf("Wrong Argument İnput !\n"), 0);
+	return (1);
 }
 
 int	main(int ac, char **av)
 {
-	t_rules	*rules;
+	t_rules		rules;
+	t_philo			philos[PHILO_MAX];
+	pthread_mutex_t	forks[PHILO_MAX];
 
 	if (!avctl(ac, av))
 		return (1);
-	rules = (t_rules *)malloc(sizeof(t_rules));
-	start_philo(rules, av);
-	main_thread(rules);
-	destroydetach(rules);
+	init_program(&rules, philos, forks, av);
+	quit(&rules, forks, -1);
 	return (0);
 }

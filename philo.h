@@ -5,55 +5,59 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/13 17:24:12 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/13 17:42:29 by skaynar          ###   ########.fr       */
+/*   Created: 2025/08/16 00:31:19 by skaynar           #+#    #+#             */
+/*   Updated: 2025/08/16 00:40:34 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
-
 # include <pthread.h>
-# include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
 # include <unistd.h>
 
+# define PHILO_MAX 210
+
 typedef struct s_philo
 {
-	bool			dead;
+	size_t			die_time;
+	size_t			last_meal;
+	size_t			start_time;
+	size_t			sleep_time;
+	size_t			eat_time;
+	int				meals_eaten;
+	int				eating;
 	int				id;
-	struct s_rules	*data;
+	int				philo_num;
+	int				eat_count;
+	int				*dead;
 	pthread_t		thread;
-	long			last_eat;
+	pthread_mutex_t	*right;
+	pthread_mutex_t	*left;
+	pthread_mutex_t	*time_meal;
+	pthread_mutex_t	*time_dead;
+	pthread_mutex_t	*time_write;
 }					t_philo;
 
 typedef struct s_rules
 {
-	pthread_mutex_t	is_eat;
-	pthread_mutex_t	mutex;
-	pthread_mutex_t	*forks;
-	struct timeval	tv;
-	int				num;
-	int				cont;
-	int				eat_count;
-	int				must_eat;
-	long			time_to_die;
-	long			time_to_eat;
-	long			time_to_sleep;
-	long			start_time;
 	t_philo			*philos;
+	pthread_mutex_t	write;
+	pthread_mutex_t	meal;
+	pthread_mutex_t	dead;
+	int				is_dead;
 }					t_rules;
 
-void				go_sleep(t_philo *p, long time);
-// void				usleep(size_t mls);
-// long				get_time_ms(void);
-void				destroydetach(t_rules *rules);
-long				set_time(t_rules *rules);
-void				for_out(t_philo *p, int num);
-size_t				ft_atoi(const char *str);
-int					numctl(char *str);
-int					avctl(int ac, char **av);
+void	quit(t_rules *rules, pthread_mutex_t *forks, int i);
+void	output(t_philo *philo, char *str);
+void	init_program(t_rules *rules,\
+t_philo *philos, pthread_mutex_t	*forks, char **av);
+size_t	get_current_time(void);
+void	ft_usleep(size_t ms);
+int	    thread_create(t_rules *rules, int i);
+void	*judge(void *pointer);
+size_t	ft_atoi(const char *str);
 
 #endif
