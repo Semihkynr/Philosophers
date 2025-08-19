@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 00:30:44 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/16 00:42:48 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/19 10:57:40 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,7 @@ void	*judge(void *pointer)
 
 	philos = (t_philo *)pointer;
 	while (1)
-		if (check_if_all_ate(philos, -1, 0) == 1
-        || check_dead(philos, -1) == 1)
+		if (check_if_all_ate(philos, -1, 0) == 1 || check_dead(philos, -1) == 1)
 			break ;
 	return (pointer);
 }

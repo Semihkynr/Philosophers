@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 00:30:23 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/16 00:30:25 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/19 10:58:13 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ size_t	ft_atoi(const char *str)
 	}
 	return (isaret * basamak);
 }
+
 int	avctl(int ac, char **av)
 {
 	int	i;
@@ -88,7 +89,7 @@ sleeping time should not be below 60.\n"),
 
 int	main(int ac, char **av)
 {
-	t_rules		rules;
+	t_rules			rules;
 	t_philo			philos[PHILO_MAX];
 	pthread_mutex_t	forks[PHILO_MAX];
 

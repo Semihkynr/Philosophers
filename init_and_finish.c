@@ -6,7 +6,7 @@
 /*   By: skaynar <skaynar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 00:29:30 by skaynar           #+#    #+#             */
-/*   Updated: 2025/08/16 00:43:06 by skaynar          ###   ########.fr       */
+/*   Updated: 2025/08/19 10:57:42 by skaynar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +59,16 @@ void	init_philos(t_rules *rules, t_philo *philos, pthread_mutex_t *forks,
 	}
 }
 
-void	init_program(t_rules *rules, t_philo *philos, pthread_mutex_t	*forks, char **av)
+void	init_program(t_rules *rules, t_philo *philos, pthread_mutex_t *forks,
+		char **av)
 {
+	size_t	i;
+
 	pthread_mutex_init(&rules->write, NULL);
 	pthread_mutex_init(&rules->meal, NULL);
 	pthread_mutex_init(&rules->dead, NULL);
 	rules->philos = philos;
 	rules->is_dead = 0;
-	size_t	i;
-
 	i = -1;
 	while (++i < ft_atoi(av[1]))
 		pthread_mutex_init(&forks[i], NULL);
